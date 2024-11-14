@@ -110,4 +110,4 @@ else:
         # Scatterplot
         st.write("Scatterplot of Actual vs Predicted Fare Amounts")
         fig, ax = plt.subplots(figsize=(6, 6))
-        sns.scatterplot(x=y_test, y=y_pred_test, alpha=0.5, ax=ax
+        sns.scatterplot(x=y_test, y=y_pred_test, alpha=0.5, ax=ax)

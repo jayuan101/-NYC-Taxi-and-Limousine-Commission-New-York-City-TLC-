@@ -1,4 +1,29 @@
-# -NYC-Taxi-and-Limousine-Commission-New-York-City-TLC-
-The data consulting firm Automatidata has recently hired you as the newest member of their data analytics team. Their newest client, the NYC Taxi and Limousine Commission (New York City TLC), wants the Automatidata team to build a multiple linear regression model to predict taxi fares using existing data that was collected over the course of a year. The team is getting closer to completing the project, having completed an initial plan of action, initial Python coding work, EDA, and A/B testing.
+# 🚖 NYC Taxi Trip Analysis
 
-The Automatidata team has reviewed the results of the A/B testing. Now it’s time to work on predicting the taxi fare amounts. You’ve impressed your Automatidata colleagues with your hard work and attention to detail. The data team believes that you are ready to build the regression model and update the client New York City TLC about your progress.
+Exploratory Data Analysis (EDA) and predictive modeling on NYC Yellow Taxi trip data.  
+This project demonstrates data cleaning, feature engineering, regression modeling, and interactive visualization.
+
+---
+
+## 📊 Project Overview
+- **Data Source:** [2017 Yellow Taxi Trip Data](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf)  
+- **Tools:** Python (Pandas, Scikit-learn, Streamlit), Tableau  
+- **Goal:** Explore patterns in trip data and build a regression model to predict fare amounts.
+
+---
+
+## 🔎 Repo Structure
+- `app/` → Streamlit app (`taxi_app.py`)  
+- `data/` → Sample CSV + instructions to download full dataset  
+- `notebooks/` → (Optional) Jupyter notebook with step-by-step EDA  
+- `tableau/` → Tableau Public dashboard link  
+- `requirements.txt` → Python dependencies  
+
+---
+
+## 🚀 How to Run Locally
+```bash
+git clone https://github.com/yourusername/taxi-trip-analysis.git
+cd taxi-trip-analysis
+pip install -r requirements.txt
+streamlit run app/taxi_app.py

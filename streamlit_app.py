@@ -2,36 +2,33 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from io import StringIO
-
-# Optional: catch missing packages
-try:
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-except ModuleNotFoundError as e:
-    st.error(f"Missing package: {e.name}. Add it to requirements.txt")
-
-try:
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.model_selection import train_test_split
-    from sklearn.linear_model import LinearRegression
-    from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
-except ModuleNotFoundError as e:
-    st.error(f"Missing package: {e.name}. Add it to requirements.txt")
-
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 
 # Set up Streamlit page
 st.set_page_config(page_title="Taxi Trip Analysis", layout="wide")
 st.title("Taxi Trip Data Analysis")
 
-# File uploader
-uploaded_file = st.file_uploader("Upload your CSV file", type="csv")
-if uploaded_file:
-    df0 = pd.read_csv(uploaded_file)
-else:
-    st.warning("Please upload a CSV file to continue.")
-    st.stop()
+# Load dataset
+@st.cache_data
+def load_data():
+    try:
+        df = pd.read_csv("2017_Yellow_Taxi_Trip_Data.csv")
+        return df
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return pd.DataFrame()
 
-df = df0.copy()
+df0 = load_data()
+if df0.empty:
+    st.error("Failed to load the dataset.")
+    st.stop()
+else:
+    df = df0.copy()
 
 # Dataset overview
 st.header("Dataset Overview")
@@ -102,6 +99,7 @@ if all(col in df.columns for col in required_columns):
     sns.scatterplot(x=y_test, y=y_pred_test, alpha=0.5, ax=ax)
     ax.set_xlabel("Actual Fare")
     ax.set_ylabel("Predicted Fare")
+    ax.set_title("Actual vs Predicted Fare Amounts")
     st.pyplot(fig)
 
     st.write("Residuals Distribution")

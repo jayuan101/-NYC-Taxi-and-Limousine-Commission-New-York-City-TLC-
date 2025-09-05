@@ -25,7 +25,8 @@ Select **pickup & dropoff zones**, input **trip duration**, and get an instant f
 # -------------------------------
 # Use your provided DB URL
 MOTHERDUCK_URL = "main@9b91bf816122b90e495db16743c62149e6d1580d"
-conn = connect(MOTHERDUCK_URL)
+# DuckDB can query MotherDuck like this
+conn = duckdb.connect(database=MOTHERDUCK_URL)
 
 # -------------------------------
 # Load Data from MotherDuck

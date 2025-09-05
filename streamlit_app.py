@@ -26,7 +26,7 @@ Select **pickup & dropoff zones**, input **trip duration**, and get a predicted 
 def load_data():
     try:
         taxi_df = pd.read_csv("2017_Yellow_Taxi_Trip_Data.csv")
-        zones_df = pd.read_csv("taxi_zones.csv")  # zone ID to name mapping
+        zones_df = pd.read_csv("taxi_zone_lookup.csv")  # zone ID to name mapping
         return taxi_df, zones_df
     except Exception as e:
         st.error(f"Error loading CSVs: {e}")

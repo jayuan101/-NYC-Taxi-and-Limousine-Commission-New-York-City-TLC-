@@ -23,13 +23,12 @@ Select **pickup & dropoff zones**, input **trip duration**, and get an instant f
 # -------------------------------
 # Connect to MotherDuck
 # -------------------------------
-# Replace with your MotherDuck project endpoint
+# Replace with your actual MotherDuck project endpoint
 MOTHERDUCK_URL = "main@9b91bf816122b90e495db16743c62149e6d1580d"
-
 conn = duckdb.connect(database=MOTHERDUCK_URL, read_only=True)
 
 # -------------------------------
-# Load Data from SQL
+# Load Data from MotherDuck
 # -------------------------------
 @st.cache_data
 def load_data():
@@ -37,10 +36,12 @@ def load_data():
     SELECT
         t.*,
         z_pickup.Zone AS Pickup_Zone,
-        z_dropoff.Zone AS Dropoff_Zone
-    FROM trips AS t
-    LEFT JOIN zones AS z_pickup ON t.PULocationID = z_pickup.LocationID
-    LEFT JOIN zones AS z_dropoff ON t.DOLocationID = z_dropoff.LocationID
+        z_dropoff.Zone AS Dropoff_Zone,
+        z_pickup.Borough AS Pickup_Borough,
+        z_dropoff.Borough AS Dropoff_Borough
+    FROM my_db.main."TAXI NYC" t
+    LEFT JOIN my_db.main.zones z_pickup ON t.PULocationID = z_pickup.LocationID
+    LEFT JOIN my_db.main.zones z_dropoff ON t.DOLocationID = z_dropoff.LocationID
     LIMIT 100000;
     """
     df = conn.execute(query).fetchdf()
@@ -55,11 +56,9 @@ if df.empty:
 # -------------------------------
 # Data Preprocessing
 # -------------------------------
-# Ensure datetime
 df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'], errors='coerce')
 df['tpep_dropoff_datetime'] = pd.to_datetime(df['tpep_dropoff_datetime'], errors='coerce')
 
-# Trip duration
 df['duration'] = (df['tpep_dropoff_datetime'] - df['tpep_pickup_datetime']).dt.total_seconds() / 60
 df = df[(df['duration'] > 0) & (df['fare_amount'] > 0)]
 
@@ -70,7 +69,7 @@ for col in ['fare_amount', 'duration']:
     upper = q3 + 6 * iqr
     df.loc[df[col] > upper, col] = upper
 
-# Feature: pickup_dropoff and mean_distance
+# Feature engineering: pickup_dropoff and mean_distance
 df['pickup_dropoff'] = df['PULocationID'].astype(str) + "_" + df['DOLocationID'].astype(str)
 avg_dist = df.groupby('pickup_dropoff')['trip_distance'].mean().to_dict()
 df['mean_distance'] = df['pickup_dropoff'].map(avg_dist)

@@ -1,4 +1,4 @@
-# Taxi Trip Data Analysis with Streamlit
+# 🚕 NYC Taxi Trip Data Analysis - Streamlit App
 
 import streamlit as st
 import pandas as pd
@@ -17,11 +17,23 @@ from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 st.set_page_config(page_title="NYC Taxi Trip Analysis", layout="wide")
 st.title("🚕 NYC Yellow Taxi Trip Data Analysis")
 
-st.write("""
-This app lets you **explore, clean, and model taxi trip data**.
-You can see dataset info, check missing values, and train a simple 
-**Linear Regression model** to predict taxi fares.  
+st.markdown("""
+Welcome!  
+This app lets you **explore, clean, and model New York City yellow taxi trip data**.  
+
+### What you can do:
+1. Preview dataset info and statistics  
+2. Check for missing values and duplicates  
+3. Train a **Linear Regression model** to predict taxi fares  
+4. Visualize predictions vs. actual fares and residuals  
 """)
+
+# -------------------------------
+# Sidebar Controls
+# -------------------------------
+st.sidebar.header("⚙️ App Settings")
+test_size = st.sidebar.slider("Test Size (for train/test split)", 0.1, 0.5, 0.2, step=0.05)
+random_state = st.sidebar.number_input("Random State (reproducibility)", value=42, step=1)
 
 # -------------------------------
 # Load Dataset
@@ -46,27 +58,25 @@ else:
 # -------------------------------
 # Dataset Overview
 # -------------------------------
-st.header("📂 Dataset Overview")
+with st.expander("📂 Dataset Overview", expanded=False):
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("**Shape of dataset:**", df.shape)
+    with col2:
+        st.write("**Columns:**", list(df.columns))
 
-col1, col2 = st.columns(2)
-with col1:
-    st.write("**Shape of dataset:**", df.shape)
-with col2:
-    st.write("**Columns:**", list(df.columns))
+    # Show dataset info
+    buffer = StringIO()
+    df.info(buf=buffer)
+    st.text(buffer.getvalue())
 
-# Show dataset info
-buffer = StringIO()
-df.info(buf=buffer)
-st.text(buffer.getvalue())
+    # Missing values and duplicates
+    st.write(f"🔍 Total missing values: **{df.isna().sum().sum()}**")
+    st.write(f"🔁 Duplicate rows: **{df.duplicated().sum()}**")
 
-# Missing values and duplicates
-st.subheader("🛠 Data Quality Check")
-st.write(f"🔍 Total missing values: **{df.isna().sum().sum()}**")
-st.write(f"🔁 Duplicate rows: **{df.duplicated().sum()}**")
-
-# Descriptive stats
-st.subheader("📊 Descriptive Statistics")
-st.write(df.describe())
+    # Descriptive stats
+    st.subheader("📊 Descriptive Statistics")
+    st.write(df.describe())
 
 # -------------------------------
 # Data Preprocessing & Features
@@ -107,12 +117,14 @@ if all(col in df.columns for col in required_columns):
     # -------------------------------
     # Modeling
     # -------------------------------
-    st.header("🤖 Predicting Taxi Fares with Linear Regression")
+    st.header("🤖 Taxi Fare Prediction")
 
     X = df[['mean_distance', 'duration']]
     y = df['fare_amount']
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
 
     scaler = StandardScaler().fit(X_train)
     X_train_scaled = scaler.transform(X_train)
@@ -126,32 +138,8 @@ if all(col in df.columns for col in required_columns):
     # Model Evaluation
     # -------------------------------
     st.subheader("📈 Model Performance")
-    st.write("**R² Score:**", round(r2_score(y_test, y_pred_test), 4))
-    st.write("**MAE:**", round(mean_absolute_error(y_test, y_pred_test), 2))
-    st.write("**MSE:**", round(mean_squared_error(y_test, y_pred_test), 2))
-    st.write("**RMSE:**", round(np.sqrt(mean_squared_error(y_test, y_pred_test)), 2))
-
-    # -------------------------------
-    # Visualizations
-    # -------------------------------
-    st.subheader("📊 Visualizations")
-
-    # Scatter plot: Actual vs Predicted
-    st.write("**Actual vs Predicted Fare**")
-    fig, ax = plt.subplots(figsize=(6, 6))
-    sns.scatterplot(x=y_test, y=y_pred_test, alpha=0.5, ax=ax)
-    ax.set_xlabel("Actual Fare ($)")
-    ax.set_ylabel("Predicted Fare ($)")
-    ax.set_title("Actual vs Predicted Fares")
-    st.pyplot(fig)
-
-    # Residuals distribution
-    st.write("**Residuals Distribution (Errors)**")
-    residuals = y_test - y_pred_test
-    fig2, ax2 = plt.subplots(figsize=(6, 4))
-    sns.histplot(residuals, bins=50, kde=True, ax=ax2)
-    ax2.set_title("Distribution of Residuals")
-    st.pyplot(fig2)
-
-else:
-    st.error("⚠️ Dataset missing required columns. Please check the input file.")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("R² Score", f"{r2_score(y_test, y_pred_test):.4f}")
+    col2.metric("MAE", f"{mean_absolute_error(y_test, y_pred_test):.2f}")
+    col3.metric("MSE", f"{mean_squared_error(y_test, y_pred_test):.2f}")
+    col4.metric("RMSE", f"{np.sqrt(me

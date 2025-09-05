@@ -24,7 +24,7 @@ Select **pickup & dropoff zones**, input **trip duration**, and get an instant f
 # Connect to MotherDuck
 # -------------------------------
 # Replace with your MotherDuck project endpoint
-MOTHERDUCK_URL = "https://your-project.motherduck.cloud"
+MOTHERDUCK_URL = "main@9b91bf816122b90e495db16743c62149e6d1580d"
 
 conn = duckdb.connect(database=MOTHERDUCK_URL, read_only=True)
 
